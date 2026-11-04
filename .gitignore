@@ -1,0 +1,11 @@
+node_modules/
+data/
+uploads/
+.env
+artifacts/
+.report-runtime/
+.edge-profile/
+.dsh-office-*/
+*.log
+.DS_Store
+Thumbs.db

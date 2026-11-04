@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#392b62">
+  <meta name="description" content="表情仓 —— 登录、上传、审核、检索与下载表情包。">
+  <title>表情仓 · Meme Vault</title>
+  <link rel="icon" href="/assets/avatar.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-grid" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+      <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+      <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+      <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24">
+      <path d="M12 16V4"></path>
+      <path d="m7 9 5-5 5 5"></path>
+      <path d="M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"></path>
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="4"></circle>
+      <path d="M4 21a8 8 0 0 1 16 0"></path>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 3 5 6v5c0 4.6 2.9 8.3 7 10 4.1-1.7 7-5.4 7-10V6l-7-3Z"></path>
+      <path d="m9 12 2 2 4-4"></path>
+    </symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24">
+      <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"></path>
+      <path d="m15 8 4 4-4 4"></path>
+      <path d="M19 12H9"></path>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-4-4"></path>
+    </symbol>
+    <symbol id="i-download" viewBox="0 0 24 24">
+      <path d="M12 4v11"></path>
+      <path d="m7 10 5 5 5-5"></path>
+      <path d="M5 20h14"></path>
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14"></path>
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18"></path>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M5 12h14"></path>
+      <path d="m14 7 5 5-5 5"></path>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="m5 12 4 4L19 6"></path>
+    </symbol>
+    <symbol id="i-x" viewBox="0 0 24 24">
+      <path d="m6 6 12 12M18 6 6 18"></path>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 7v5l3 2"></path>
+    </symbol>
+    <symbol id="i-image" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+      <circle cx="9" cy="10" r="1.5"></circle>
+      <path d="m5 18 5-5 4 4 2-2 3 3"></path>
+    </symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24">
+      <path d="M12 3c.7 4.6 2.4 6.3 7 7-4.6.7-6.3 2.4-7 7-.7-4.6-2.4-6.3-7-7 4.6-.7 6.3-2.4 7-7Z"></path>
+      <path d="M19 17c.3 2 1 2.7 3 3-2 .3-2.7 1-3 3-.3-2-1-2.7-3-3 2-.3 2.7-1 3-3Z"></path>
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24">
+      <path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path>
+    </symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24">
+      <path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"></path>
+    </symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24">
+      <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"></path>
+      <circle cx="12" cy="13.5" r="3.5"></circle>
+    </symbol>
+  </svg>
+
+  <main id="auth-screen" class="auth-screen">
+    <section class="auth-visual" aria-label="表情仓介绍">
+      <div class="auth-brand">
+        <span class="brand-mark" aria-hidden="true"><img src="/assets/avatar.png" alt="" width="44" height="44"></span>
+        <span class="brand-copy"><strong>表情仓</strong><small>MEME VAULT</small></span>
+      </div>
+
+      <div class="auth-copy">
+        <p class="eyebrow eyebrow-light">✦ YOUR DAILY REACTION LIBRARY</p>
+        <h1>把每一张<br><em>好用的表情</em><br>收进仓里<span class="headline-spark">✦</span></h1>
+        <p class="auth-lead">欢迎来到表情异次元！上传、检索、审核、下载，让每个心情都有专属画面。</p>
+      </div>
+
+      <div class="meme-collage" aria-hidden="true">
+        <div class="meme-sticker sticker-a">
+          <img class="sticker-image" src="/assets/meme-puzzled-pig.jpeg" alt="" width="96" height="96" decoding="async">
+        </div>
+        <div class="meme-sticker sticker-b">
+          <img class="sticker-image" src="/assets/meme-fox-girl.png" alt="" width="96" height="96" decoding="async">
+        </div>
+        <div class="meme-sticker sticker-c">
+          <img class="sticker-image" src="/assets/meme-yellow-bird.jpg" alt="" width="96" height="96" decoding="async">
+        </div>
+      </div>
+
+      <div class="auth-footline">
+        <span>BUILT FOR TEAMS</span>
+        <span class="footline-line"></span>
+        <span>v0.1 · 2026</span>
+      </div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-mobile-brand">
+        <span class="brand-mark" aria-hidden="true"><img src="/assets/avatar.png" alt="" width="44" height="44"></span>
+        <span class="brand-copy"><strong>表情仓</strong><small>MEME VAULT</small></span>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-heading">
+          <p class="eyebrow" id="auth-kicker">WELCOME BACK</p>
+          <h2 id="auth-title">欢迎回来</h2>
+          <p id="auth-subtitle">登录后继续收集今天的好心情。</p>
+        </div>
+
+        <div class="auth-tabs" role="tablist" aria-label="登录或注册">
+          <button class="auth-tab is-active" type="button" role="tab" aria-selected="true" data-auth-tab="login">登录</button>
+          <button class="auth-tab" type="button" role="tab" aria-selected="false" data-auth-tab="register">注册</button>
+        </div>
+
+        <form id="auth-form" class="auth-form" novalidate>
+          <label class="field">
+            <span class="field-label">用户名</span>
+            <span class="input-wrap">
+              <svg class="field-icon" aria-hidden="true"><use href="#i-user"></use></svg>
+              <input id="auth-username" name="username" type="text" autocomplete="username" maxlength="24" placeholder="2–24 位中英文、数字或下划线" required>
+            </span>
+          </label>
+
+          <label class="field">
+            <span class="field-label">密码</span>
+            <span class="input-wrap">
+              <svg class="field-icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+              <input id="auth-password" name="password" type="password" autocomplete="current-password" maxlength="128" placeholder="至少 8 位字符" required>
+            </span>
+          </label>
+
+          <label class="field" id="confirm-field" hidden>
+            <span class="field-label">确认密码</span>
+            <span class="input-wrap">
+              <svg class="field-icon" aria-hidden="true"><use href="#i-check"></use></svg>
+              <input id="auth-confirm" name="confirm" type="password" autocomplete="new-password" maxlength="128" placeholder="再输入一次密码">
+            </span>
+          </label>
+
+          <p class="form-error" id="auth-error" role="alert" hidden></p>
+
+          <button class="btn btn-primary btn-block auth-submit" id="auth-submit" type="submit">
+            <span>进入表情仓</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow"></use></svg>
+          </button>
+        </form>
+
+        <p class="auth-hint" id="auth-hint">还没有账号？<button type="button" class="text-btn" data-auth-switch="register">立即注册</button></p>
+      </div>
+
+      <p class="auth-legal">登录即表示你同意合理使用团队共享内容。</p>
+    </section>
+  </main>
+
+  <div id="app-shell" class="app-shell" hidden>
+    <aside class="sidebar">
+      <button class="sidebar-brand" type="button" data-view="square" aria-label="返回表情广场">
+        <span class="brand-mark" aria-hidden="true"><img src="/assets/avatar.png" alt="" width="44" height="44"></span>
+        <span class="brand-copy"><strong>表情仓</strong><small>MEME VAULT</small></span>
+      </button>
+
+      <p class="sidebar-label">工作台</p>
+      <nav class="sidebar-nav" aria-label="主导航">
+        <button class="nav-item is-active" type="button" data-view="square">
+          <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
+          <span>表情广场</span>
+        </button>
+        <button class="nav-item" type="button" data-view="mine">
+          <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
+          <span>我的上传</span>
+        </button>
+        <button class="nav-item" type="button" data-view="review" data-staff-only hidden>
+          <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+          <span>审核台</span>
+          <span class="nav-badge" id="review-badge" hidden>0</span>
+        </button>
+        <button class="nav-item" type="button" data-feature-view="favorites"><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg><span>我的收藏</span></button>
+        <button class="nav-item" type="button" data-feature-view="ranking"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg><span>下载排行</span></button>
+        <button class="nav-item" type="button" data-feature-view="content" data-admin-feature hidden><svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg><span>内容管理</span></button>
+        <button class="nav-item" type="button" data-feature-view="categories" data-admin-feature hidden><svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg><span>分类管理</span></button>
+        <button class="nav-item" type="button" data-feature-view="users" data-admin-feature hidden><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg><span>用户管理</span></button>
+        <button class="nav-item" type="button" data-feature-view="audit" data-admin-feature hidden><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg><span>操作日志</span></button>
+        <button class="nav-item" type="button" data-feature-view="security"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg><span>账号安全</span></button>
+      </nav>
+
+      <div class="sidebar-cta">
+        <span class="cta-spark">✦</span>
+        <p>有新鲜表情？</p>
+          <span>上传表情，让快乐入库。</span>
+        <button class="btn btn-light btn-sm" type="button" data-open-upload>
+          <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+          上传表情
+        </button>
+      </div>
+
+      <div class="sidebar-user">
+        <span class="avatar" id="user-avatar" aria-hidden="true">U</span>
+        <span class="sidebar-user-copy">
+          <strong id="user-name">加载中</strong>
+          <small id="user-role">普通用户</small>
+        </span>
+        <button class="icon-btn icon-btn-dark" id="logout-btn" type="button" title="退出登录" aria-label="退出登录">
+          <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="topbar">
+        <div class="topbar-title">
+          <p class="eyebrow" id="page-eyebrow">DISCOVER</p>
+          <h1 id="page-title">表情广场</h1>
+        </div>
+        <div class="topbar-actions">
+          <details class="feature-menu"><summary class="btn btn-outline btn-sm">更多功能</summary><div class="feature-menu-list">
+            <button type="button" data-feature-view="favorites">我的收藏</button><button type="button" data-feature-view="ranking">下载排行</button>
+            <button type="button" data-feature-view="content" data-admin-feature hidden>内容管理</button><button type="button" data-feature-view="categories" data-admin-feature hidden>分类管理</button>
+            <button type="button" data-feature-view="users" data-admin-feature hidden>用户管理</button><button type="button" data-feature-view="audit" data-admin-feature hidden>操作日志</button>
+            <button type="button" data-feature-view="security">账号安全</button>
+          </div></details>
+          <label class="search" id="search-wrap">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input id="search-input" type="search" maxlength="50" placeholder="搜索标题、分类、标签或上传者" autocomplete="off" aria-label="搜索表情">
+          </label>
+          <button class="btn btn-primary top-upload" type="button" data-open-upload>
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+            <span>上传表情</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="page" data-page="square">
+          <section class="hero">
+            <div class="hero-copy">
+              <p class="eyebrow">✦ DROP A MOOD · FIND A MEME</p>
+              <h2>今天的心情，<br><span class="hero-highlight">交给表情发言！</span></h2>
+              <p class="hero-lead">把灵感和快乐收进团队的表情仓。看到好图随手上传，需要时一搜就有。</p>
+              <div class="hero-actions">
+                <button class="btn btn-dark" type="button" data-open-upload>
+                  <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+                  上传表情
+                </button>
+                <span class="hero-formats">PNG · JPG · GIF · WebP<br>单张最大 5 MB · 每批最多 10 张</span>
+              </div>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <span class="hero-bubble">诶？！<small>今天也要元气满满</small></span>
+              <div class="art-card art-card-main">
+                <img class="art-image" src="/assets/avatar.png" alt="" width="140" height="140" decoding="async">
+                <span class="art-caption">今日份元气</span>
+              </div>
+              <div class="art-card art-card-top">
+                <img class="art-image" src="/assets/meme-fox-girl.png" alt="" width="96" height="96" decoding="async">
+                <span class="art-caption">狐狐登场</span>
+              </div>
+              <div class="art-card art-card-bottom">
+                <img class="art-image" src="/assets/meme-puzzled-pig.jpeg" alt="" width="104" height="104" decoding="async">
+                <span class="art-caption">嗯？</span>
+              </div>
+              <span class="art-spark art-spark-a">✦</span>
+              <span class="art-spark art-spark-b">✦</span>
+            </div>
+          </section>
+
+          <div class="library-head">
+            <div>
+              <p class="section-index">01 / 表情广场</p>
+              <h3>大家的收藏<span class="title-dot">.</span></h3>
+            </div>
+            <div class="sort-switch" role="group" aria-label="排序方式">
+              <button type="button" class="is-active" data-sort="latest">最新</button>
+              <button type="button" data-sort="popular">最热</button>
+            </div>
+          </div>
+
+          <div class="category-row" id="category-row" aria-label="表情分类">
+            <span class="loading-chip">正在加载分类…</span>
+          </div>
+
+          <p class="result-line" id="result-line">正在翻找表情仓…</p>
+
+          <div class="emoji-grid" id="square-grid"></div>
+          <div class="zip-toolbar"><button class="btn btn-outline btn-sm" type="button" data-download-selected>下载选中的表情 ZIP</button></div>
+
+          <div class="empty-state" id="square-empty" hidden>
+            <span class="empty-illustration" aria-hidden="true"><svg class="icon"><use href="#i-image"></use></svg></span>
+            <h3>这里还空空的</h3>
+            <p id="square-empty-text">还没有通过审核的表情，上传第一张来热热场子。</p>
+            <button class="btn btn-primary" type="button" data-open-upload>
+              <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+              上传第一张
+            </button>
+          </div>
+
+          <div class="load-more-wrap" id="load-more-wrap" hidden>
+            <button class="btn btn-outline" id="load-more-btn" type="button">再看一些</button>
+          </div>
+        </section>
+
+        <section class="page" data-page="mine" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="section-index">02 / 我的上传</p>
+              <h2>我的表情收藏夹</h2>
+              <p>查看审核进度，管理还没发布的表情。</p>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="mine-stats">
+            <article class="stat-card stat-total"><span>全部</span><strong>0</strong><small>张表情</small></article>
+            <article class="stat-card stat-approved"><span>已发布</span><strong>0</strong><small>正在广场展示</small></article>
+            <article class="stat-card stat-pending"><span>待审核</span><strong>0</strong><small>等待审核员处理</small></article>
+            <article class="stat-card stat-rejected"><span>未通过</span><strong>0</strong><small>可修改后重传</small></article>
+          </div>
+
+          <div class="subhead">
+            <h3>全部投稿</h3>
+            <span id="mine-count">0 张</span>
+          </div>
+          <div class="emoji-grid mine-grid" id="mine-grid"></div>
+          <div class="empty-state" id="mine-empty" hidden>
+            <span class="empty-illustration" aria-hidden="true"><svg class="icon"><use href="#i-upload"></use></svg></span>
+            <h3>你还没有上传过表情</h3>
+            <p>把收藏夹里最好用的那张图分享出来吧。</p>
+            <button class="btn btn-primary" type="button" data-open-upload>开始上传</button>
+          </div>
+        </section>
+
+        <section class="page" data-page="review" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="section-index">03 / 审核台</p>
+              <h2>把好内容放进广场</h2>
+              <p>审核通过后，所有登录用户都能看到并下载。</p>
+            </div>
+            <span class="role-pill"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg><span id="review-role-label">审核员</span></span>
+          </div>
+
+          <div class="review-banner">
+            <div class="review-banner-icon"><svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg></div>
+            <div>
+              <strong id="review-summary">待审核队列加载中…</strong>
+              <p>请确认图片内容适合团队共享，并选择合适的分类。</p>
+            </div>
+            <span class="review-count" id="review-count">—</span>
+          </div>
+
+          <div class="review-list" id="review-list"></div>
+          <div class="batch-review-bar"><label><input id="review-select-all" type="checkbox"> 全选当前队列</label><button class="btn btn-primary btn-sm" id="batch-approve" type="button">批量通过</button><button class="btn btn-outline btn-sm" id="batch-reject" type="button">批量驳回</button></div>
+          <div class="empty-state" id="review-empty" hidden>
+            <span class="empty-illustration" aria-hidden="true"><svg class="icon"><use href="#i-check"></use></svg></span>
+            <h3>审核队列已清空</h3>
+            <p>这一批内容都处理完了，去广场看看大家的收藏吧。</p>
+            <button class="btn btn-outline" type="button" data-go-square>返回表情广场</button>
+          </div>
+        </section>
+
+        <section class="page feature-page" data-page="feature" hidden>
+          <div class="page-heading"><div><p class="section-index" id="feature-index">EXTRA / 表情仓</p><h2 id="feature-title">更多功能</h2><p id="feature-description">管理你的表情仓。</p></div></div>
+          <div id="feature-content" aria-live="polite"></div>
+        </section>
+
+        <footer class="app-footer">
+          <span>表情仓 · MEME VAULT</span>
+          <span>团队表情库 · 上传 / 审核 / 收藏 / 下载</span>
+        </footer>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="移动端导航">
+      <button class="mobile-nav-item is-active" type="button" data-view="square">
+        <svg class="icon" aria-hidden="true"><use href="#i-grid"></use></svg>
+        <span>广场</span>
+      </button>
+      <button class="mobile-nav-item" type="button" data-view="mine">
+        <svg class="icon" aria-hidden="true"><use href="#i-folder"></use></svg>
+        <span>我的</span>
+      </button>
+      <button class="mobile-nav-item" type="button" data-view="review" data-staff-only hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+        <span>审核</span>
+        <span class="mobile-badge" id="mobile-review-badge" hidden>0</span>
+      </button>
+      <button class="mobile-nav-item mobile-nav-upload" type="button" data-open-upload aria-label="上传表情">
+        <span class="mobile-upload-mark"><svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg></span>
+        <span>上传</span>
+      </button>
+    </nav>
+  </div>
+
+  <dialog class="modal" id="upload-dialog" aria-labelledby="upload-title">
+    <form class="modal-card" id="upload-form" novalidate>
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">NEW MEME</p>
+          <h2 id="upload-title">上传表情</h2>
+        </div>
+        <button class="icon-btn modal-close" type="button" data-close-dialog aria-label="关闭上传窗口">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0" aria-label="选择或拖入图片，最多十张">
+        <input id="file-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden>
+        <div class="drop-empty" id="drop-empty">
+          <span class="drop-icon"><svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg></span>
+          <strong>把图片拖到这里</strong>
+          <span>可多选 · 每批最多 10 张 · 单张最大 5 MB</span>
+        </div>
+        <div class="drop-preview" id="drop-preview" hidden>
+          <span class="preview-media"><img id="preview-img" alt="待上传图片预览"></span>
+          <span class="preview-copy">
+            <strong id="preview-name">图片</strong>
+            <small id="preview-meta">0 KB</small>
+          </span>
+          <button class="icon-btn preview-remove" id="remove-file" type="button" aria-label="移除图片">
+            <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label class="field">
+          <span class="field-label">标题 <em>可选</em></span>
+          <span class="input-wrap input-wrap-plain">
+            <input id="upload-title-input" type="text" maxlength="60" placeholder="例如：笑不活了">
+          </span>
+        </label>
+        <label class="field">
+          <span class="field-label">分类 <em>可选</em></span>
+          <span class="input-wrap input-wrap-plain">
+            <input id="upload-category" type="text" maxlength="20" list="category-options" placeholder="例如：开心">
+            <datalist id="category-options">
+              <option value="开心"></option>
+              <option value="无语"></option>
+              <option value="搞笑"></option>
+              <option value="猫猫"></option>
+              <option value="职场"></option>
+              <option value="日常"></option>
+            </datalist>
+          </span>
+        </label>
+        <label class="field">
+          <span class="field-label">标签 <em>逗号分隔，最多 5 个</em></span>
+          <span class="input-wrap input-wrap-plain"><input id="upload-tags" type="text" maxlength="160" placeholder="例如：可爱, 摸鱼"></span>
+        </label>
+      </div>
+
+      <p class="form-note" id="upload-note">
+        <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+        <span id="upload-note-text">普通用户上传后需要审核，通过后才会出现在表情广场。</span>
+      </p>
+      <p class="form-error" id="upload-error" role="alert" hidden></p>
+
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" type="button" data-close-dialog>取消</button>
+        <button class="btn btn-primary" id="upload-submit" type="submit">
+          <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg>
+          <span>上传并提交</span>
+        </button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal modal-small" id="reject-dialog" aria-labelledby="reject-title">
+    <form class="modal-card" id="reject-form" novalidate>
+      <header class="modal-head">
+        <div>
+          <p class="eyebrow">REVIEW NOTE</p>
+          <h2 id="reject-title">驳回这张表情</h2>
+        </div>
+        <button class="icon-btn modal-close" type="button" data-close-reject aria-label="关闭驳回窗口">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+      <p class="reject-target" id="reject-target">表情</p>
+      <label class="field">
+        <span class="field-label">驳回原因 <em>可选，最多 200 字</em></span>
+        <span class="input-wrap input-wrap-plain">
+          <textarea id="reject-note" rows="4" maxlength="200" placeholder="告诉上传者需要调整什么，例如：图片太模糊、与分类不符…"></textarea>
+        </span>
+      </label>
+      <p class="form-error" id="reject-error" role="alert" hidden></p>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" type="button" data-close-reject>取消</button>
+        <button class="btn btn-danger" id="reject-submit" type="submit">
+          <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+          <span>确认驳回</span>
+        </button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="toast-stack" id="toast-stack" role="status" aria-live="polite"></div>
+
+  <script src="/app.js" defer></script>
+  <script src="/features.js" defer></script>
+</body>
+</html>

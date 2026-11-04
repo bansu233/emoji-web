@@ -1,0 +1,16 @@
+{
+  "name": "meme-vault",
+  "version": "0.1.0",
+  "private": true,
+  "description": "表情仓 - 登录、上传、审核、检索与下载表情包的轻量 Web 应用",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env --watch server.js",
+    "test": "node --disable-warning=ExperimentalWarning test/app.test.js",
+    "create-user": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/create-user.js"
+  }
+}
