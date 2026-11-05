@@ -1,0 +1,17 @@
+.git
+.github
+.gitignore
+.env
+.env.*
+!.env.example
+data
+uploads
+backups
+node_modules
+docs
+report
+test
+artifacts
+*.log
+Thumbs.db
+.DS_Store

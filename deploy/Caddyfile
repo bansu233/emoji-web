@@ -1,0 +1,27 @@
+{
+  admin off
+}
+
+{$DOMAIN} {
+  encode zstd gzip
+
+  # Batch upload accepts up to 10 images / 5 MB each, plus thumbnails.
+  # Keep this above the application's 54 MB body limit.
+  request_body {
+    max_size 56MB
+  }
+
+  header {
+    Strict-Transport-Security "max-age=31536000"
+    -Server
+  }
+
+  reverse_proxy app:3000 {
+    header_up X-Real-IP {remote_host}
+  }
+
+  log {
+    output stdout
+    format console
+  }
+}

@@ -10,26 +10,7 @@
 
 ![第二阶段管理页](docs/screenshots/phase-two-admin.png)
 
-## 首周已完成
-
-- 账号注册、登录、退出，密码加密存储，登录会话使用 HttpOnly Cookie。
-- 普通用户单张上传 PNG / JPG / GIF / WebP，最大 5 MB，自动识别真实图片格式并读取宽高。
-- 审核员/管理员审核队列，可通过或驳回并填写驳回原因。
-- 表情广场按最新/最热排序，支持标题、分类、上传者搜索和分类筛选。
-- 我的上传：查看全部投稿、审核状态、审核备注，删除未通过/待审核内容。
-- 单张下载，服务端返回 `attachment` 下载头，下载次数累加。
-- 普通用户、审核员、管理员三种角色，界面与接口双重权限校验。
-- 响应式界面，支持桌面端与移动端。
-
-## 第二阶段已完成
-
-- 一次多选或拖拽最多 10 张图片，逐张校验格式与大小；审核台可批量通过或驳回最多 50 条。
-- 管理员可管理分类、编辑任何表情的标题/分类/标签、将内容移入回收站并恢复。
-- 表情支持标签、收藏、下载排行，以及最多 20 张图片的 ZIP 打包下载。
-- 管理员可调整用户角色、停用/启用账号、重置密码，查看审核及管理操作审计日志。
-- 用户可修改自己的密码、查看并移除其他登录设备。角色变更与管理员重置密码会使目标用户现有会话失效。
-- 浏览器上传时生成 WebP 缩略图；非 GIF 图片在压缩明显有效时使用压缩版。可配置 S3 兼容对象存储，默认仍使用本地文件。
-- 按 IP 或用户分别限制注册、登录、上传、审核、打包下载和密码操作频率。
+> 云端部署请直接看 **[DEPLOY.md](DEPLOY.md)**：Docker Compose + Caddy 自动 HTTPS、持久化、备份与 GitHub Actions。
 
 ## 预览
 
@@ -50,15 +31,6 @@ npm start
 ```
 
 打开 <http://127.0.0.1:3000>。**不需要 `npm install`**，项目没有任何第三方依赖。
-
-首次启动会自动创建开发环境示例账号：
-
-| 用户名 | 密码 | 角色 |
-| --- | --- | --- |
-| `admin` | `Admin@123456` | 管理员 |
-| `reviewer` | `Review@123456` | 审核员 |
-
-> 以上密码仅限本地开发。部署到云端前必须关闭示例账号或替换密码，见「部署」一节。
 
 运行后端集成测试：
 
@@ -114,8 +86,13 @@ npm test
 │  ├─ images.js             # 图片格式/尺寸识别与文本清洗
 │  └─ security.js           # 密码、会话、Cookie 工具
 ├─ scripts/create-user.js   # 创建账号 / 重置密码 / 修改角色
+├─ scripts/backup.js        # SQLite + uploads 一致性备份
 ├─ test/app.test.js         # 后端集成测试
 ├─ server.js                # 启动入口
+├─ Dockerfile               # 生产镜像
+├─ docker-compose.yml       # app + Caddy
+├─ deploy/                  # Caddyfile / 生产环境变量样例
+├─ ops/backup.sh            # Docker 环境备份入口
 ├─ data/                    # 运行时数据库（自动创建，已 gitignore）
 └─ uploads/                 # 运行时图片（自动创建，已 gitignore）
 ```
@@ -173,6 +150,8 @@ npm test
 
 ## 部署到云端
 
+> 推荐使用 Docker Compose + Caddy 的自动 HTTPS 方案，完整步骤见 **[DEPLOY.md](DEPLOY.md)**。下面的手工方式适合已有 Nginx/进程管理器的服务器。
+
 ### 1. 准备账号（推荐）
 
 云端首次部署不要使用开发默认密码。关闭示例账号，再用命令行创建管理员和审核员：
@@ -225,7 +204,8 @@ server {
     listen 443 ssl;
     server_name meme.example.com;
 
-    client_max_body_size 6m;
+    # 支持一次最多 10 张、每张 5 MB 的批量上传
+    client_max_body_size 56m;
 
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -244,7 +224,7 @@ server {
 - [ ] `SEED_DEMO_ACCOUNTS=0`，或已替换默认密码
 - [ ] 使用 HTTPS，`COOKIE_SECURE=1`
 - [ ] `data/`、`uploads/` 已挂载持久化卷并纳入备份
-- [ ] 反向代理限制请求体大小（建议 6 MB）
+- [ ] 反向代理限制请求体大小（批量上传建议 56 MB）
 - [ ] 不将 `uploads/` 直接暴露给公网
 - [ ] 首次部署后登录管理员账号，实际上传、审核、下载各走一遍
 

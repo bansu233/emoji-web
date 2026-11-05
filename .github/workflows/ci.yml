@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run integration tests
+        run: npm test
+
+  deploy-config:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Compose file
+        run: |
+          cp deploy/env.production.example .env.production
+          docker compose config --quiet
+
+      - name: Validate Caddyfile
+        run: |
+          docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
+
+      - name: Build application image
+        run: docker build -t emoji-web:ci .

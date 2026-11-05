@@ -11,6 +11,7 @@
     "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env server.js",
     "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env --watch server.js",
     "test": "node --disable-warning=ExperimentalWarning test/app.test.js",
-    "create-user": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/create-user.js"
+    "create-user": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/create-user.js",
+    "backup": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env scripts/backup.js"
   }
 }

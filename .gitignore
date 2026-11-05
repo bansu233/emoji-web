@@ -1,11 +1,14 @@
 node_modules/
 data/
 uploads/
+backups/
 .env
+.env.production
 artifacts/
 .report-runtime/
 .edge-profile/
 .dsh-office-*/
+.deploy-tmp/
 *.log
 .DS_Store
 Thumbs.db
